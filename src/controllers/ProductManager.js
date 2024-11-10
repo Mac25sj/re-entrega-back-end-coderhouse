@@ -6,82 +6,69 @@ class ProductManager {
         this.path = "./src/models/products.json";
     }
 
-    //Para leer productos del JSON
-    readProduts = async () => {
+    // Método para leer productos del JSON
+    readProducts = async () => {
         let products = await fs.readFile(this.path, "utf-8");
         return JSON.parse(products);
     }
 
-    writeProducts = async (product) => {
-        await fs.writeFile(this.path, JSON.stringify(product))
+    // Método para escribir productos en el archivo JSON
+    writeProducts = async (products) => {
+        await fs.writeFile(this.path, JSON.stringify(products, null, 2));
     }
 
-    //Función auxiliar para comprobar si el ID existe
+    // Función auxiliar para comprobar si el ID existe
     exist = async (id) => {
-        let products = await this.readProduts();
-        return products.find(prod => prod.id === id)
+        let products = await this.readProducts();
+        return products.find(prod => prod.id === id);
     }
 
-    // Método para escribir productos en el archivo
+    // Método para agregar productos
     addProducts = async (product) => {
-        let productOld = await this.readProduts();
-        product.id = nanoid()
-        let productAll = [...productOld, product];
-        await this.writeProducts(productAll);
-        return "Producto agregado"
+        let productsOld = await this.readProducts();
+        product.id = nanoid();
+        let productsAll = [...productsOld, product];
+        await this.writeProducts(productsAll);
+        return "Producto agregado";
     };
 
-
-    //Get product / consigna (Cito función readProducts)
+    // Método para obtener todos los productos
     getProducts = async () => {
-        return await this.readProduts()
-
+        return await this.readProducts();
     };
-    //Get product fin
 
-    //Actualizar Producto 
+    // Método para actualizar un producto
     updateProducts = async (id, product) => {
-        let productById = await this.exist(id)///pregunto si esta
-        if (!productById) return "⚠️ Producto no encontrado, por favor verificar"
-        // si esta, borro producto y despues lo subo modificado
-        await this.deleteProducts(id)
-        let productOld = await this.readProduts() // Como paso por el delete, ya no tiene el objeto
-        let products = [{product, id : id}, ...productOld] 
-        await this.writeProducts(products)
-        return "💪 Producto actualizado con éxito"
+        let productById = await this.exist(id);
+        if (!productById) return "⚠️ Producto no encontrado, por favor verificar";
+        
+        // Eliminar el producto antiguo y añadir el actualizado
+        let productsOld = await this.readProducts(); 
+        let products = productsOld.filter(prod => prod.id !== id);
+        products.push({ ...productById, ...product, id: id });
+
+        await this.writeProducts(products);
+        return "💪 Producto actualizado con éxito";
     }
-    //Actualizar Producto Fin
 
-
-    //Get productby ID - Consigna
+    // Método para obtener un producto por ID
     getProductsById = async (id) => {
-        let productById = await this.exist(id)
-        //validación
-        if (!productById) return "⚠️ Producto no encontrado, por favor verificar"
-        return productById
+        let productById = await this.exist(id);
+        if (!productById) return "⚠️ Producto no encontrado, por favor verificar";
+        return productById;
     };
 
-    //Get productby ID Fin
-
-    //Eliminar Producto 
+    // Método para eliminar un producto
     deleteProducts = async (id) => {
-        let products = await this.readProduts();
-        let existProducts = products.some(prod => prod.id === id)
-        //some devuelve T or F. valído
+        let products = await this.readProducts();
+        let existProducts = products.some(prod => prod.id === id);
         if (existProducts) {
-            let filterProducts = products.filter(prod => prod.id != id)
-            await this.writeProducts(filterProducts)
-            return " ☠️El producto se ha eliminado correctamente"
+            let filterProducts = products.filter(prod => prod.id !== id);
+            await this.writeProducts(filterProducts);
+            return "☠️ El producto se ha eliminado correctamente";
         }
-        return "🤔 El producto que deseas eliminar es inexistente. Verfica nuevamente el ID"
-
+        return "🤔 El producto que deseas eliminar es inexistente. Verifica nuevamente el ID";
     }
 }
-//Eliminar Producto fin
 
-
-
-
-
-
-export default ProductManager
+export default ProductManager;
