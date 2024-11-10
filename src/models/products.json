@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "title": "Guitarra ",
+    "description": "Fender Clasica",
+    "price": "400",
+    "thumbnail": "",
+    "code": "15",
+    "stock": "5",
+    "id": "kj9HDjLKtsIASIJqKunBW"
+  },
+  {
+    "title": "Guitarra",
+    "description": "Gibson Les Paul",
+    "price": "400",
+    "thumbnail": "",
+    "code": "16",
+    "stock": "11",
+    "id": "YxXP9aezj-32inSph-Xip"
+  }
+]
